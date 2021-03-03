@@ -1,0 +1,25 @@
+{% extends 'passcode/layout.html' %}
+
+{% block title %}PassCode{% endblock %}
+
+{% block body %}
+<form action="{% url 'index' %}" method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <input type="submit" value="検索">
+</form>
+{% for item in data %}
+<ul>
+  <div>{{ item.title }}</div><br>
+  {% for number in item.kind %}
+  <li>
+    <a>{{ number }}</a>
+  </li>
+  {% endfor %}
+</ul>
+{% endfor %}
+{% endblock %}
+
+{% block list %}
+a
+{% endblock %}
