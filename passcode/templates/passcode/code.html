@@ -1,0 +1,29 @@
+{% extends 'passcode/layout.html' %}
+
+{% block title %}Code{% endblock %}
+
+{% block body %}
+<h1>{{ title.title }}</h1>
+<form action="{% url 'code' id kind  %}" method="post">
+  {% csrf_token %}
+  {{ form }}
+  <input type="submit" value="検索">
+</form>
+<div><a href="{% url 'postform' id kind %}">投稿フォーム</a></div>
+{% for item in data %}
+<ul>
+  <li><a href="{% url 'comment' item.id %}">{{ item.title }}</a></li>
+  <li>{{ item.oner }}</li>
+</ul>
+{% endfor %}
+{% endblock %}
+
+<!-- イイねリスト -->
+{% block list %}
+{% for item in list %}
+<ul>
+  <li>{{ item.title }}</li>
+  <li>{{ item.oner }}</li>
+</ul>
+{% endfor %}
+{% endblock %}

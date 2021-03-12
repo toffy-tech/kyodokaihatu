@@ -13,7 +13,7 @@
   <div>{{ item.title }}</div><br>
   {% for number in item.kind %}
   <li>
-    <a>{{ number }}</a>
+    <a href="{% url 'code' item.id number %}">{{ number }}</a>
   </li>
   {% endfor %}
 </ul>
