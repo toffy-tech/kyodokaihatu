@@ -4,6 +4,8 @@
 
 {% block body %}
 <h1>{{ title.title }}</h1>
+<div><a href="{% url 'good' id %}">good</a></div>
+<div><a href="{% url 'code_report' id %}">report</a></div>
 <form action="{% url 'comment' id %}" method="post">
   {% csrf_token %}
   {{ form.as_p }}
@@ -11,6 +13,7 @@
 </form>
 {% for item in data %}
 <p>{{item.comment}}</p>
+<div><a href="{% url 'comment_report' id item.id %}">report</a></div>
 {% endfor %}
 {% endblock %}
 
@@ -18,8 +21,8 @@
 {% block list %}
 {% for item in list %}
 <ul>
-  <li>{{ item.title }}</li>
-  <li>{{ item.oner }}</li>
+  <li><a href="{% url 'comment' item.id %}">{{ item.title }}</a></li>
+  <li><a href="{% url 'person' item.oner.id %}">{{ item.oner }}</a></li>
 </ul>
 {% endfor %}
 {% endblock %}

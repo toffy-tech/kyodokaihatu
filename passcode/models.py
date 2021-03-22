@@ -40,3 +40,24 @@ class Comment(models.Model):
 
   def __str__(self):
     return '<Comment:id='+str(self.id)+',user_id='+str(self.user)+'>'
+
+class Good(models.Model):
+  code=models.ForeignKey(Code,on_delete=models.CASCADE,related_name='good_owner')
+  user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='good_user')
+
+  def __str__(self):
+    return '<Comment:id='+str(self.id)+',user_id='+str(self.user)+str(self.code)+'>'
+
+class CodeReport(models.Model):
+  code=models.ForeignKey(Code,on_delete=models.CASCADE,related_name='report_owner')
+  user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='code_report_user')
+
+  def __str__(self):
+    return '<Comment:id='+str(self.id)+',user_id='+str(self.user)+str(self.code)+'>'
+
+class CommentReport(models.Model):
+  comment=models.ForeignKey(Comment,on_delete=models.CASCADE,related_name='report_owner')
+  user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='comment_report_user')
+
+  def __str__(self):
+    return '<Comment:id='+str(self.id)+',user_id='+str(self.user)+str(self.comment)+'>'

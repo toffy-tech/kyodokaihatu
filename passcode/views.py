@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib import messages
 from django.views.generic import TemplateView
 from .forms import PassCodeForm
 from .forms import PassCodeLanguageForm
@@ -11,11 +12,16 @@ from .forms import PostForm
 from .models import Part
 from .models import Code
 from .models import Comment
+from .models import Language
+from .models import Good
+from .models import CodeReport
+from .models import CommentReport
+from django.views.generic import View
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 import datetime
 
 class PassCodeView(TemplateView):
-
   def __init__(self):
     self.params={
       'form':PassCodeForm,
@@ -85,8 +91,7 @@ class PassCodeCodeView(TemplateView):
     self.params['list']=item
     return render(request,'passcode/code.html',self.params)
 
-# @login_required(login_url='/admin/login/')
-class PostFormView(TemplateView):
+class PostFormView(LoginRequiredMixin,TemplateView):
 
   def __init__(self):
 
@@ -107,16 +112,16 @@ class PostFormView(TemplateView):
     self.params['kind']=kind
     title=request.POST['title']
     oner=request.user
-    part=part
+    part=Part.objects.get(id=part)
     kind=kind
-    language=request.POST['language']
+    language=Language.objects.get(id=request.POST['language'])
     explain=request.POST['explain']
     time=request.POST['time']
     date=datetime.datetime.now()
     content=request.POST['content']
-    code=Code(title=title,oner=oner,part=part,kind=kind,language=language,explain=explain,time=time,date=date,content=content,code=content)
+    code=Code(title=title,oner=oner,part=part,kind=kind,language=language,explain=explain,time=time,date=date,content=content)
     code.save()
-    return redirect(to='/passcode/code/part/kind')
+    return redirect(to='/passcode/')
 
 
 class PassCodeCommentView(TemplateView):
@@ -142,10 +147,8 @@ class PassCodeCommentView(TemplateView):
     self.params['data']=item_comment
 
     # イイねリストの取り出し
-    item=Code.objects.filter(id=part)
-    
-    # ranking=Code.objects.filter(part=item['part'],kind=item['kind']).order_by('good').reverse()[0:5]
-    self.params['list']=item
+    ranking=Code.objects.filter(part=item.part,kind=item.kind).order_by('good').reverse()[0:5]
+    self.params['list']=ranking
 
     return render(request,'passcode/comment.html',self.params)
 
@@ -162,10 +165,89 @@ class PassCodeCommentView(TemplateView):
     self.params['data']=item_comment
 
     # イイねリストの取り出し
-    item=Code.objects.filter(id=part)
-    
-    # ranking=Code.objects.filter(part=item['part'],kind=item['kind']).order_by('good').reverse()[0:5]
-    self.params['list']=item
+    ranking=Code.objects.filter(part=item.part,kind=item.kind).order_by('good').reverse()[0:5]
+    self.params['list']=ranking
 
     return render(request,'passcode/comment.html',self.params)
 
+@login_required()
+def good(request,code_id):
+  good_code=Code.objects.get(id=code_id)
+  is_good=Good.objects.filter(user=request.user).filter(code=good_code).count()
+
+  if is_good > 0:
+    messages.success(request,'即にGoodしています。')
+    return redirect(to='/passcode/comment/'+str(code_id))
+  
+  good_code.good+=1
+  good_code.save()
+
+  good=Good()
+  good.user=request.user
+  good.code=good_code
+  good.save()
+  return redirect(to='/passcode/comment/'+str(code_id))
+
+@login_required()
+def code_report(request,code_id):
+  report_code=Code.objects.get(id=code_id)
+  is_good=CodeReport.objects.filter(user=request.user).filter(code=report_code).count()
+
+  if is_good > 0:
+    messages.success(request,'即にReportしています。')
+    return redirect(to='/passcode/comment/'+str(code_id))
+  
+  report_code.report+=1
+  report_code.save()
+
+  report=CodeReport()
+  report.user=request.user
+  report.code=report_code
+  report.save()
+  return redirect(to='/passcode/comment/'+str(code_id))
+
+@login_required()
+def comment_report(request,comment_id,comment_item):
+  report_comment=Comment.objects.get(id=comment_item)
+  is_good=CommentReport.objects.filter(user=request.user).filter(comment=report_comment).count()
+
+  if is_good > 0:
+    messages.success(request,'即にReportしています。')
+    return redirect(to='/passcode/comment/'+str(comment_id))
+  
+  report_comment.report+=1
+  report_comment.save()
+
+  report=CommentReport()
+  report.user=request.user
+  report.comment=report_comment
+  report.save()
+  return redirect(to='/passcode/comment/'+str(comment_id))
+
+
+
+class PassCodePersonView(TemplateView):
+
+  def __init__(self):
+    self.params={
+      'title':{},
+      'list':{},
+    }
+
+  def get(self,request,user):
+
+    self.title=Code.objects.get(id=user)
+
+    item=Code.objects.filter(oner=user).order_by('date').reverse()
+    self.params['list']=item
+
+    return render(request,'passcode/person.html',self.params)
+
+  def post(self,request,user):
+    
+    self.title=Code.objects.get(id=user)
+
+    item=Code.objects.filter(oner=user).order_by('date').reverse()
+    self.params['list']=item
+
+    return render(request,'passcode/person.html',self.params)

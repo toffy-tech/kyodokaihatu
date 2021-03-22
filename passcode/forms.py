@@ -15,6 +15,8 @@ class PassCodeLanguageForm(forms.Form):
 class PassCodeCommentForm(forms.Form):
   word=forms.CharField(label='keyword')
 
+
+
 class PostForm(forms.Form):
   # 言語の取り出し
   item=Language.objects.all()

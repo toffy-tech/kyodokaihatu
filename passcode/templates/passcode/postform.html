@@ -6,7 +6,7 @@
 <form action="{% url 'postform' id kind %}" method="post">
   {% csrf_token %}
   {{ form.as_table }}
-  <input type="submit" value="検索">
+  <input type="submit" value="作成">
 </form>
 {% endblock %}
 

@@ -1,0 +1,17 @@
+{% extends 'passcode/layout.html' %}
+
+{% block title %}PassCode{% endblock %}
+
+{% block body %}
+<h1>{{ title.title }}</h1>
+{% for item in list %}
+<ul>
+  <li><a href="{% url 'comment' item.id %}">{{ item.title }}</a></li>
+  <li>{{ item.oner }}</li>
+</ul>
+{% endfor %}
+{% endblock %}
+
+{% block list %}
+<div></div>
+{% endblock %}

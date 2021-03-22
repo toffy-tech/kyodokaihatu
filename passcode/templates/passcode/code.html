@@ -13,7 +13,7 @@
 {% for item in data %}
 <ul>
   <li><a href="{% url 'comment' item.id %}">{{ item.title }}</a></li>
-  <li>{{ item.oner }}</li>
+  <li><a href="{% url 'person' item.oner.id %}">{{ item.oner }}</a></li>
 </ul>
 {% endfor %}
 {% endblock %}
@@ -22,8 +22,8 @@
 {% block list %}
 {% for item in list %}
 <ul>
-  <li>{{ item.title }}</li>
-  <li>{{ item.oner }}</li>
+  <li><a href="{% url 'comment' item.id %}">{{ item.title }}</a></li>
+  <li><a href="{% url 'person' item.oner.id %}">{{ item.oner }}</a></li>
 </ul>
 {% endfor %}
 {% endblock %}
